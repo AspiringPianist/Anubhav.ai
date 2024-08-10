@@ -29,6 +29,8 @@ Here's a link for the quick demo : [Youtube](https://youtu.be/a4pJpp_DbgQ)
 
 ### Running the Chatbot
 
+Make sure you have [ollama](https://ollama.ai) installed, and then run this command in the terminal. `ollama pull nomic-embed-text`. Then follow these steps.
+
 1. After installing dependencies with `pip install -r requirements.txt `, Run the Flask application using `app.py` or run `flask --app app run` in the terminal.
 2. Open a web browser and navigate to `http://127.0.0.1:5000` to access the chatbot interface.
 
