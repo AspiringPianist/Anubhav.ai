@@ -76,7 +76,6 @@ This project is licensed under the MIT License. See [LICENSE](LICENSE) for detai
 
 * [Flask](https://flask.palletsprojects.com/en/2.0.x/) for the web framework.
 * [HTML, CSS, and JavaScript](https://www.w3.org/) for the user interface.
-* [External API](https://example.com/api) for mindmap creation.
 * [YouTube](https://www.youtube.com/) for video content.
 * [PDF.js](https://mozilla.github.io/pdf.js/) for PDF viewing.
 * [Vis.js](https://visjs.org/) for mindmap visualization.
