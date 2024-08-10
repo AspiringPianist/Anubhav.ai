@@ -67,12 +67,14 @@ For example, here's a mindmap generated about this github repo by the chatbot it
 * Quizzes are generated based on user input and stored in a database, also an API that can be scaled to any LLM.
 * Media content is displayed using embedded YouTube videos and PDF viewers.
 * Chroma DB was used for vector stores.
+* Ollama was used for embeddings using the `nomic-embed-text` model.
 
 ## Limitations
 ---------
 * Since Llama 3 does not have a generous enough context size for 1 hour long videos, you might run into issues where the input tokens exceeds the maximum of about 10-12k.
 * Some attempts were to use larger models for answering queries, and using lighter models like the 8B parameters version for quiz creation and mindmap generation.
 * Only Instruct models were used, chat models provide unfavourable results.
+* Local embedding models are used via ollama to convert the chunks to vector embeddings, due to API limitations.
 
 ## Contributing
 ---------------
@@ -94,6 +96,7 @@ This project is licensed under the MIT License. See [LICENSE](LICENSE) for detai
 * [Vis.js](https://visjs.org/) for mindmap visualization.
 * [Together.ai](https://api.together.ai/) for LLM API (Llama 3 and Llama 3.1)
 * [Langchain](https://www.langchain.com/)
+* [Ollama](https://ollama.ai/)
 
 ## Contact
 ---------
