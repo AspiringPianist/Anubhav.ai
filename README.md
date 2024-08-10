@@ -12,9 +12,9 @@ Anubhav.ai is a chatbot with media viewer capabilities, built using HTML, CSS, J
 * **Chatbot functionality**: Engage in conversations with the chatbot, ask questions, and receive responses.
 * **Mindmap creation**: Create mindmaps on specific topics using the `/Mindmap` command.
 * **Quiz creation**: Generate quizzes on specific topics using the `/QuizCreate` command.
-* **Media viewer**: View YouTube videos and PDF documents in the media viewer.
+* **Media viewer**: View YouTube videos and PDF documents in the media viewer, by just `pasting link directly in the input field`.
 * **Chat history**: View previous conversations with the chatbot.
-* **Media selector**: Select and view previous media content.
+* **Media selector**: Select and view previous media content, like generated mindmaps or uploaded documents and videos.
 * **Chat Folders**: Organize your chat sessions, by storing them in different folders, each with their own vector store for RAG.
 
 ## How to Use
@@ -23,7 +23,7 @@ Anubhav.ai is a chatbot with media viewer capabilities, built using HTML, CSS, J
 ### Running the Chatbot
 
 1. Run the Flask application using `app.py`.
-2. Open a web browser and navigate to `http://localhost:5000` to access the chatbot interface.
+2. Open a web browser and navigate to `http://127.0.0.1:5000` to access the chatbot interface.
 
 ### Interacting with the Chatbot
 
