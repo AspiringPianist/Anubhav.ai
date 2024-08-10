@@ -82,6 +82,8 @@ This project is licensed under the MIT License. See [LICENSE](LICENSE) for detai
 * [YouTube](https://www.youtube.com/) for video content.
 * [PDF.js](https://mozilla.github.io/pdf.js/) for PDF viewing.
 * [Vis.js](https://visjs.org/) for mindmap visualization.
+* [Together.ai](https://api.together.ai/) for LLM API (Llama 3 and Llama 3.1)
+* [Langchain](https://www.langchain.com/)
 
 ## Contact
 ---------
