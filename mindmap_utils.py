@@ -5,6 +5,8 @@ from langchain.prompts import PromptTemplate
 from query_data import query_rag
 from langchain_together import Together
 import textwrap
+import json
+import os
 
 together_api_key = "fb5107bddcd0f7f144ca41251d77bbb59f9f5f64cb21435473f15a2801d28d73"
 def wrap_text(text, width=20):
@@ -67,7 +69,15 @@ def generate_mindmap(topic: str, chat_id : str) -> MindMap:
         else:
             raise
 
-    return convert_to_network_data(mindmap)
+    network_data = convert_to_network_data(mindmap)
+    
+    # # Save the mindmap data
+    # filename = f"{topic.replace(' ', '_')}.json"  # Remove '_mindmap' from here
+    # filepath = os.path.join('chats', chat_id, 'media', 'mindmaps', filename)
+    # with open(filepath, 'w') as f:
+    #     json.dump(network_data, f)
+    
+    return network_data
 
 
 def convert_to_network_data(mindmap: MindMap) -> dict:
