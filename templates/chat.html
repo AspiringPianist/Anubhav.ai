@@ -1,0 +1,668 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Chatbot with Media Viewer</title>
+    <link rel="shortcut icon" href="{{ url_for('static', filename='anubhava.jpg') }}">
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.1.3/css/bootstrap.min.css" crossorigin="anonymous">
+    <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.5.0/css/all.css" crossorigin="anonymous">
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+    <script type="text/javascript" src="https://unpkg.com/vis-network/standalone/umd/vis-network.min.js"></script>
+    <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='style.css') }}"/>
+</head>
+<body>
+    <div class="container-fluid">
+        <div class="row">
+            <!-- Chatbot Column -->
+            <div class="col-md-6 chat-column">
+                <div class="chat">
+                    <div class="card">
+                        <div class="card-header msg_head">
+                            <div class="d-flex bd-highlight">
+                                <div class="img_cont">
+                                    <img src="{{url_for('static', filename = 'anubhava.jpg')}}" class="rounded-circle user_img">
+                                </div>
+                                <div class="user_info">
+                                    <span>Anubhav.ai</span>
+                                    <p>Ask me anything!</p>
+                                </div>
+                            </div>
+                        </div>
+                        <div id="messageFormeight" class="card-body msg_card_body">
+                            <!-- Messages will be dynamically inserted here -->
+                        </div>
+                        <div class="card-footer">                            
+                            
+                            <form id="messageArea" class="input-group">
+                                <input type="text" id="text" name="msg" placeholder="Type your message or paste YouTube link..." autocomplete="off" class="form-control type_msg" required />
+                                <input type="file" id="pdfUpload" accept=".pdf" style="display: none;">
+                                <div class="input-group-append">
+                                    <button type="button" id="uploadPdf" class="input-group-text">
+                                        <i class="fas fa-file-pdf"></i>
+                                    </button>
+                                    <button type="submit" id="send" class="input-group-text send_btn">
+                                        <i class="fas fa-location-arrow"></i>
+                                    </button>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Media Viewer Column -->
+            <div class="col-md-6 media-column">
+                <div class="media-viewer">
+                    <div class="card">
+                        <div class="card-header">
+                            <h5>Media Viewer</h5>
+                            <button id="newChatBtn" class="btn btn-primary mb-2">New Chat</button>
+                            <select id="chatSessionSelector" class="form-control mb-2">
+                                <option value="">Select Chat Session</option>
+                            </select>
+                            <select id="mediaSelector" class="form-control">
+                                <option value="">Select Media</option>
+                            </select>
+                        </div>
+                        <div class="card-body" id="mediaContent">
+                            <!-- Media content will be displayed here -->
+                            <div id="mindmap-container" style="height: 100%; width: 100%;"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <style>
+        /* Quiz Styles */
+        .quiz-box {
+            background-color: #f0f0f0;
+            border-radius: 10px;
+            padding: 15px;
+            margin-top: 10px;
+        }
+    
+        .quiz-box h3 {
+            margin-bottom: 15px;
+            color: #333;
+        }
+    
+        .question {
+            margin-bottom: 15px;
+        }
+    
+        .question p {
+            font-weight: bold;
+            margin-bottom: 5px;
+        }
+    
+        .question label {
+            display: block;
+            margin-left: 20px;
+        }
+    
+        .quiz-instruction {
+            margin-top: 15px;
+            font-style: italic;
+            color: #666;
+        }
+    
+        .quiz-result {
+            background-color: #e9f7ef;
+            padding: 15px;
+            border-radius: 8px;
+        }
+    
+        .quiz-result h4 {
+            color: #2ecc71;
+            margin-bottom: 10px;
+        }
+    
+        /* Message Styles */
+        .msg_cotainer, .msg_cotainer_send {
+            max-width: 80%;
+            width: auto;
+            word-wrap: break-word;
+            white-space: pre-wrap;
+        }
+    
+        .messageText {
+            white-space: pre-wrap;
+        }
+    
+        .sources {
+            margin-top: 10px;
+            font-size: 0.8em;
+            color: #666;
+        }
+    
+        .source {
+            margin-bottom: 5px;
+        }
+    
+        /* Loading Styles */
+        .loading {
+            font-style: italic;
+            color: #666;
+        }
+    
+        /* Copy Button Styles */
+        .copy-btn {
+            cursor: pointer;
+            margin-left: 10px;
+        }
+    
+        /* Remove unused styles */
+        /* .submit-quiz-btn, #quizContainer, .quiz-header, #toggleQuiz, .quiz-content */
+    </style>
+    
+    <script>
+var currentChatId;
+var mediaList = [];
+var mediaList = [];
+
+$(document).ready(function() {
+    //currentChatId = "{{ chat_id }}";
+    var initialMedia = JSON.parse('{{ initial_media | safe }}');
+    loadChatSessions();
+    updateMediaSelector(initialMedia);
+    //loadChatHistory(currentChatId);
+});
+
+let currentQuiz = null;
+
+function generateQuiz(topic) {
+    displayUserMessage(`/QuizCreate ${topic}`);
+
+    let loadingHtml = `
+        <div class="d-flex justify-content-start mb-4">
+            <div class="img_cont_msg">
+                <img src="{{url_for('static', filename = 'anubhava.jpg')}}" class="rounded-circle user_img_msg">
+            </div>
+            <div class="msg_cotainer">
+                <div class="loading">Generating quiz...</div>
+                <span class="msg_time">${new Date().toLocaleTimeString()}</span>
+            </div>
+        </div>
+    `;
+    $("#messageFormeight").append(loadingHtml);
+    scrollToBottom();
+
+    $.ajax({
+        url: '/generate_quiz',
+        type: 'POST',
+        contentType: 'application/json',
+        data: JSON.stringify({ topic: topic }),
+        success: function(response) {
+            currentQuiz = response;
+            displayQuiz(response);
+            $(".loading").closest(".d-flex").remove();
+        },
+        error: function(xhr, status, error) {
+            console.error("Error generating quiz:", error);
+            $(".loading").html('Error generating quiz. Please try again.');
+        }
+    });
+}
+
+function displayQuiz(quiz) {
+    let quizHtml = `
+        <div class="d-flex justify-content-start mb-4">
+            <div class="img_cont_msg">
+                <img src="{{url_for('static', filename = 'anubhava.jpg')}}" class="rounded-circle user_img_msg">
+            </div>
+            <div class="msg_cotainer">
+                <div class="quiz-box">
+                    <h3>Quiz on ${quiz.topic}</h3>
+                    <div class="questions">
+                        ${quiz.questions.map((question, index) => `
+                            <div class="question">
+                                <p>${index + 1}. ${question.question.replace(/\n/g, '<br>')}</p>
+                                ${question.choices.map((choice, choiceIndex) => `
+                                    <label>
+                                        <input type="radio" name="q${index}" value="${choiceIndex}">
+                                        ${choice.replace(/\n/g, '<br>')}
+                                    </label>
+                                `).join('')}
+                            </div>
+                        `).join('')}
+                    </div>
+                    <p class="quiz-instruction">Type "/QuizSubmit" to submit your answers.</p>
+                </div>
+                <span class="msg_time">${new Date().toLocaleTimeString()}</span>
+            </div>
+        </div>
+    `;
+
+    $("#messageFormeight").append(quizHtml);
+    scrollToBottom();
+}
+
+function submitQuiz() {
+    if (!currentQuiz) {
+        alert("No active quiz to submit!");
+        return;
+    }
+
+    let answers = [];
+    currentQuiz.questions.forEach((question, index) => {
+        let selectedAnswer = $(`input[name="q${index}"]:checked`).val();
+        answers.push(selectedAnswer ? parseInt(selectedAnswer) : null);
+    });
+
+    let loadingHtml = `
+        <div class="d-flex justify-content-start mb-4">
+            <div class="img_cont_msg">
+                <img src="{{url_for('static', filename = 'anubhava.jpg')}}" class="rounded-circle user_img_msg">
+            </div>
+            <div class="msg_cotainer">
+                <div class="loading">Submitting quiz...</div>
+                <span class="msg_time">${new Date().toLocaleTimeString()}</span>
+            </div>
+        </div>
+    `;
+    $("#messageFormeight").append(loadingHtml);
+    scrollToBottom();
+
+    $.ajax({
+        url: '/submit_quiz',
+        type: 'POST',
+        contentType: 'application/json',
+        data: JSON.stringify({ answers: answers }),
+        success: function(response) {
+            $(".loading").closest(".d-flex").remove();
+            displayQuizResult(response);
+        },
+        error: function(xhr, status, error) {
+            console.error("Error submitting quiz:", error);
+            $(".loading").html('Error submitting quiz. Please try again.');
+        }
+    });
+}
+
+function displayQuizResult(result) {
+    let resultHtml = `
+        <div class="d-flex justify-content-start mb-4">
+            <div class="img_cont_msg">
+                <img src="{{url_for('static', filename = 'anubhava.jpg')}}" class="rounded-circle user_img_msg">
+            </div>
+            <div class="msg_cotainer">
+                <div class="quiz-result">
+                    <h4>Quiz Result</h4>
+                    <p>Your score: ${result.score}/${result.total} (${result.percentage.toFixed(2)}%)</p>
+                </div>
+                <span class="msg_time">${new Date().toLocaleTimeString()}</span>
+            </div>
+        </div>
+    `;
+    $("#messageFormeight").append(resultHtml);
+    scrollToBottom();
+    currentQuiz = null;
+}
+
+function loadChatSession(sessionId) {
+    $.get('/load_chat_session/' + sessionId, function(data) {
+        $("#messageFormeight").empty();
+        data.messages.forEach(function(message) {
+            if (message.is_user) {
+                displayUserMessage(message.content);
+            } else {
+                displayBotMessage(message.content);
+            }
+        });
+        updateMediaSelector(data.media);
+        scrollToBottom();
+    });
+}
+
+function loadChatSessions() {
+    $.get('/get_chat_sessions', function(data) {
+        console.log("Received chat sessions:", data);
+        var $selector = $("#chatSessionSelector");
+        $selector.empty().append('<option value="">Select Chat Session</option>');
+        if (data && data.sessions && Array.isArray(data.sessions)) {
+            data.sessions.forEach(function(session) {
+                $selector.append(`<option value="${session.id}">${session.title}</option>`);
+            });
+        } else {
+            console.log("No valid sessions data received");
+        }
+    }).fail(function(error) {
+        console.error("Error loading chat sessions:", error);
+    });
+}
+
+function loadChatHistory(chatId) {
+    $.get('/get_chat_history/' + chatId, function(data) {
+        $("#messageFormeight").empty();
+        data.messages.forEach(function(message) {
+            if (message.is_user) {
+                displayUserMessage(message.content);
+            } else {
+                displayBotMessage(message.content);
+            }
+        });
+        updateMediaSelector(data.media);
+        scrollToBottom();
+    });
+}
+
+function updateMediaSelector(media) {
+    mediaList = media;
+    var $selector = $("#mediaSelector");
+    $selector.empty().append('<option value="">Select Media</option>');
+    media.forEach(function(item, index) {
+        $selector.append(`<option value="${index}">${item.name}</option>`);
+    });
+}
+
+function displayUserMessage(message) {
+    let userMessageHtml = `
+        <div class="d-flex justify-content-end mb-4">
+            <div class="msg_cotainer_send">
+                ${message}
+                <span class="msg_time_send">${new Date().toLocaleTimeString()}</span>
+            </div>
+            <div class="img_cont_msg">
+                <img src="https://i.ibb.co/d5b84Xw/Untitled-design.png" class="rounded-circle user_img_msg">
+            </div>
+        </div>
+    `;
+    $("#messageFormeight").append(userMessageHtml);
+    scrollToBottom();
+}
+
+function displayBotMessage(message) {
+    let botMessageHtml = `
+        <div class="d-flex justify-content-start mb-4">
+            <div class="img_cont_msg">
+                <img src="{{url_for('static', filename = 'anubhava.jpg')}}" class="rounded-circle user_img_msg">
+            </div>
+            <div class="msg_cotainer">
+                <div class="messageText">${message}</div>
+                <span class="msg_time">${new Date().toLocaleTimeString()}</span>
+                <i class="fas fa-copy copy-btn" onclick="copyToClipboard(this)"></i>
+            </div>
+        </div>
+    `;
+    $("#messageFormeight").append(botMessageHtml);
+    scrollToBottom();
+}
+
+function scrollToBottom() {
+    var chatContainer = document.getElementById("messageFormeight");
+    chatContainer.scrollTop = chatContainer.scrollHeight;
+}
+
+function displayMedia(mediaItem) {
+    console.log("Displaying media:", mediaItem);
+    var $mediaContent = $("#mediaContent");
+    $mediaContent.empty();
+
+    if (mediaItem.type === 'mindmaps' || mediaItem.type === 'mindmap') {
+        console.log("Rendering mindmap");
+        $mediaContent.html('<div id="mindmap-container" style="height: 100%; width: 100%;"></div>');
+        $.getJSON(`/get_mindmap/${currentChatId}/${mediaItem.name}`, function(data) {
+            var container = document.getElementById('mindmap-container');
+            var options = {
+                layout: {
+                    hierarchical: {
+                        direction: "UD",
+                        sortMethod: "directed",
+                        nodeSpacing: 150,
+                        levelSeparation: 150
+                    }
+                },
+                physics: false,
+                interaction: {
+                    dragNodes: true,
+                    dragView: true,
+                    zoomView: true
+                }
+            };
+            var network = new vis.Network(container, data, options);
+        });
+    } else if (mediaItem.type === 'youtube') {
+        console.log("Rendering YouTube video");
+        var videoId = getYouTubeVideoId(mediaItem.name);
+        $mediaContent.html(`<div class="video-container"><iframe src="https://www.youtube.com/embed/${videoId}" frameborder="0" allowfullscreen></iframe></div>`);
+    } else if (mediaItem.type === 'documents') {
+        console.log("Rendering document");
+        var height = $mediaContent.height();
+        $mediaContent.html(`<embed src="/get_document/${currentChatId}/${mediaItem.name}" type="application/pdf" width="100%" height="${height}px" />`);
+    } else {
+        console.log("Unknown media type:", mediaItem.type);
+    }
+}
+
+$("#chatSessionSelector").change(function() {
+    var sessionId = $(this).val();
+    if (sessionId) {
+        currentChatId = sessionId;
+        loadChatSession(sessionId);
+        loadChatHistory(sessionId);
+    }
+});
+
+$("#mediaSelector").change(function() {
+    var selectedIndex = $(this).val();
+    if (selectedIndex !== "") {
+        displayMedia(mediaList[selectedIndex]);
+    }
+});
+
+$("#newChatBtn").click(function() {
+    currentChatId = null;
+    $("#messageFormeight").empty();
+    $("#mediaSelector").empty().append('<option value="">Select Media</option>');
+    $("#text").focus();
+});
+
+
+$("#messageArea").on("submit", function(event) {
+    event.preventDefault();
+    const date = new Date();
+    const str_time = date.toLocaleTimeString();
+    var rawText = $("#text").val();
+    if (!currentChatId) {
+        // Create a new chat session with the user's message as the title
+        $.post('/new_chat', { title: rawText }, function(data) {
+            currentChatId = data.chat_id;
+            $("#chatSessionSelector").prepend(`<option value="${data.chat_id}" selected>${rawText}</option>`);
+        });
+    }
+    if (rawText.trim() === "") {
+        return;
+    }else if (rawText.startsWith("/Mindmap")) {
+        var topic = rawText.substring(8).trim();
+        createMindmap(topic);
+        $("#text").val("");
+    } else if (rawText.startsWith("/QuizCreate")) {
+        var topic = rawText.substring(11).trim();
+        generateQuiz(topic);
+        $("#text").val("");
+    } else if (rawText.trim() === "/QuizSubmit") {
+        displayUserMessage("/QuizSubmit");
+        submitQuiz();
+        $("#text").val("");
+    } else if (isYouTubeLink(rawText)) {
+        addMedia('youtube', rawText);
+        processYouTubeLink(rawText);
+        $("#text").val("");
+    } else {
+        var userHtml = '<div class="d-flex justify-content-end mb-4"><div class="msg_cotainer_send user_message">' + escapeHtml(rawText) + '<span class="msg_time_send">' + str_time + '</span><i class="fas fa-copy copy-btn" onclick="copyToClipboard(this)"></i></div><div class="img_cont_msg"><img src="https://i.ibb.co/d5b84Xw/Untitled-design.png" class="rounded-circle user_img_msg"></div></div>';
+        $("#text").val("");
+        $("#messageFormeight").append(userHtml);
+        scrollToBottom();
+
+        $.ajax({
+            type: "POST",
+            url: "/send",
+            data: { msg: rawText, chat_id: currentChatId },
+            success: function() {
+                const source = new EventSource(`/stream?msg=${encodeURIComponent(rawText)}&chat_id=${currentChatId}`);
+                var botHtml = `
+<div class="d-flex justify-content-start mb-4">
+    <div class="img_cont_msg">
+        <img src="{{url_for('static', filename = 'anubhava.jpg')}}" class="rounded-circle user_img_msg">
+    </div>
+    <div class="msg_cotainer">
+        <div class="messageText"></div>
+        <span class="blinking-cursor">|</span>
+        <div class="sources"></div>
+        <span class="msg_time">${str_time}</span>
+        <i class="fas fa-copy copy-btn" onclick="copyToClipboard(this)"></i>
+    </div>
+</div>`;
+                var botMessageElement = $($.parseHTML(botHtml)).appendTo("#messageFormeight");
+                scrollToBottom();
+
+                let messageText = botMessageElement.find(".messageText")[0];
+                let cursor = botMessageElement.find(".blinking-cursor")[0];
+                source.onmessage = function(event) {
+                    if (event.data.trim() === "[EOS]") {
+                        cursor.remove();
+                    } else if (event.data.trim() === "[DONE]") {
+                        source.close();
+                    } else if (event.data.startsWith("SOURCE:")) {
+                        let sourceText = event.data.substring(7);
+                        let sourceElement = $('<div class="source"></div>').text(sourceText);
+                        botMessageElement.find('.sources').append(sourceElement);
+                    } else {
+                        let decodedText = $('<div/>').html(event.data).text();
+                        let formattedText = decodedText.replace(/\n/g, '<br>');
+                        let messageTextElement = botMessageElement.find('.messageText');
+                        messageTextElement.append(formattedText);
+                        scrollToBottom();
+                    }
+                };
+
+                source.onerror = function() {
+                    var errorHtml = '<div class="d-flex justify-content-start mb-4"><div class="msg_cotainer">Error: Could not reach the server.<span class="msg_time">' + str_time + '</span></div></div>';
+                    $("#messageFormeight").append($.parseHTML(errorHtml));
+                    scrollToBottom();
+                    source.close();
+                };
+            }
+        });
+    }
+});
+
+function createMindmap(topic) {
+    $.ajax({
+        url: '/create_mindmap',
+        type: 'POST',
+        contentType: 'application/json',
+        data: JSON.stringify({ topic: topic, chat_id: currentChatId }),
+        success: function(response) {
+            addMedia('mindmap', response.filename, `Mindmap: ${topic}`);
+        },
+        error: function(xhr, status, error) {
+            console.error("Error creating mindmap:", error);
+            alert("Error creating mindmap: " + xhr.responseJSON.error);
+        }
+    });
+}
+
+function processYouTubeLink(url) {
+    $.ajax({
+        url: '/process_youtube',
+        type: 'POST',
+        contentType: 'application/json',
+        data: JSON.stringify({ url: url, chat_id: currentChatId }),
+        success: function(response) {
+            console.log("YouTube video processed:", response.message);
+            addMedia('youtube', url);
+        },
+        error: function(xhr, status, error) {
+            console.error("Error processing YouTube video:", error);
+            alert("Error processing YouTube video: " + xhr.responseJSON.error);
+        }
+    });
+}
+
+function addMedia(type, content, name) {
+    var mediaItem = { type: type, content: content, name: name || content };
+    mediaList.push(mediaItem);
+    updateMediaSelector(mediaList);
+    $("#mediaSelector").val(mediaList.length - 1).change();
+}
+
+function isYouTubeLink(str) {
+    return str.match(/^(https?:\/\/)?(www\.)?(youtube\.com|youtu\.?be)\/.+$/);
+}
+
+function getYouTubeVideoId(url) {
+    var regExp = /^.*(youtu.be\/|v\/|u\/\w\/|embed\/|watch\?v=|\&v=)([^#\&\?]*).*/;
+    var match = url.match(regExp);
+    return (match && match[2].length === 11) ? match[2] : null;
+}
+
+function escapeHtml(unsafe) {
+    return unsafe
+        .replace(/&/g, "&amp;")
+        .replace(/</g, "&lt;")
+        .replace(/>/g, "&gt;")
+        .replace(/"/g, "&quot;")
+        .replace(/'/g, "&#039;");
+}
+
+function copyToClipboard(element) {
+    const messageContainer = $(element).closest('.msg_cotainer, .msg_cotainer_send');
+    let textToCopy;
+    
+    function getTextWithNewlines(element) {
+        return $(element).html().replace(/<br\s*[\/]?>/gi, "\n").replace(/&nbsp;/g, ' ');
+    }
+    
+    if (messageContainer.hasClass('user_message')) {
+        textToCopy = messageContainer.clone().children().remove().end().text().trim();
+    } else {
+        const messageText = getTextWithNewlines(messageContainer.find(".messageText")).trim();
+        const sourcesText = messageContainer.find(".sources").text().trim();
+        textToCopy = messageText + (sourcesText ? "\n\nSources:\n" + sourcesText : "");
+    }
+    
+    textToCopy = textToCopy.replace(/\n{3,}/g, '\n\n');
+    
+    navigator.clipboard.writeText(textToCopy).then(function() {
+        alert('Copied to clipboard');
+    }, function(err) {
+        console.error('Could not copy text: ', err);
+    });
+}
+
+$("#uploadPdf").click(function() {
+    $("#pdfUpload").click();
+});
+
+$("#pdfUpload").change(function(e) {
+    var file = e.target.files[0];
+    if (file && file.type === "application/pdf") {
+        var formData = new FormData();
+        formData.append('file', file);
+        formData.append('chat_id', currentChatId);
+        
+        $.ajax({
+            url: '/upload_pdf',
+            type: 'POST',
+            data: formData,
+            contentType: false,
+            processData: false,
+            success: function(response) {
+                alert(response.message);
+                addMedia('documents', URL.createObjectURL(file), file.name);
+            },
+            error: function(xhr, status, error) {
+                alert("Error uploading file: " + xhr.responseJSON.error);
+            }
+        });
+    }
+});
+
+
+    </script>
+</body>
+</html>
