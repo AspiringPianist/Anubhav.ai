@@ -79,6 +79,7 @@ This project is licensed under the MIT License. See [LICENSE](LICENSE) for detai
 * [External API](https://example.com/api) for mindmap creation.
 * [YouTube](https://www.youtube.com/) for video content.
 * [PDF.js](https://mozilla.github.io/pdf.js/) for PDF viewing.
+* [Vis.js](https://visjs.org/) for mindmap visualization.
 
 ## Contact
 ---------
