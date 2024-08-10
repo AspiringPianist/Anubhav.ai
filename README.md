@@ -107,4 +107,4 @@ This project is licensed under the MIT License. See [LICENSE](LICENSE) for detai
 ## Contact
 ---------
 
-If you have any questions or need help with the chatbot, please contact [Your Name](mailto:your@email.com).
+If you have any questions or need help with the chatbot, please contact [me here](mailto:unnathchittimalla@gmail.com).
