@@ -281,6 +281,11 @@ def get_chat_history(chat_id):
 @app.route('/get_mindmap/<chat_id>/<filename>')
 def get_mindmap(chat_id, filename):
     chat_dir = create_chat_directory(chat_id)
+    filename = filename.replace(' ', '_')
+    if filename.endswith('_mindmap.json'):
+        filename = filename.replace('_mindmap.json', '.json')
+    elif filename.endswith('._mindmap.json'):
+        filename = filename.replace('._mindmap.json', '.json')
     filepath = os.path.join(chat_dir, 'media', 'mindmaps', filename)
     if os.path.exists(filepath):
         with open(filepath, 'r') as f:
