@@ -25,7 +25,7 @@ For example, here's a mindmap generated about this github repo by the chatbot it
 
 ### Running the Chatbot
 
-1. Run the Flask application using `app.py`.
+1. After installing dependencies with `pip install -r requirements.txt `, Run the Flask application using `app.py` or run `flask --app app run` in the terminal.
 2. Open a web browser and navigate to `http://127.0.0.1:5000` to access the chatbot interface.
 
 ### Interacting with the Chatbot
