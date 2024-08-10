@@ -15,6 +15,7 @@ Anubhav.ai is a chatbot with media viewer capabilities, built using HTML, CSS, J
 * **Media viewer**: View YouTube videos and PDF documents in the media viewer.
 * **Chat history**: View previous conversations with the chatbot.
 * **Media selector**: Select and view previous media content.
+* **Chat Folders**: Organize your chat sessions, by storing them in different folders, each with their own vector store for RAG.
 
 ## How to Use
 --------------
