@@ -8,6 +8,8 @@ Anubhav.ai is a chatbot with media viewer capabilities, built using HTML, CSS, J
 
 Here's a link for the quick demo : [Youtube](https://youtu.be/a4pJpp_DbgQ)
 
+[Main Screenshot](https://github.com/AspiringPianist/Anubhav.ai/blob/main/main_ss?raw=True)
+
 ## Features
 ------------
 
@@ -19,8 +21,8 @@ Here's a link for the quick demo : [Youtube](https://youtu.be/a4pJpp_DbgQ)
 * **Media selector**: Select and view previous media content, like generated mindmaps or uploaded documents and videos.
 * **Chat Folders**: Organize your chat sessions, by storing them in different folders, each with their own vector store for RAG. They are titled by your first message to chatbot.
 
-  [Screenshot 1]()
-  [Screenshot 2]()
+  [Screenshot 1](https://github.com/AspiringPianist/Anubhav.ai/blob/main/ss1.jpg?raw=True)
+  [Screenshot 2](https://github.com/AspiringPianist/Anubhav.ai/blob/main/ss2.jpg?raw=True)
 
 ## How to Use
 --------------
