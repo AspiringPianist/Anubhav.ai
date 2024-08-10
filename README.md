@@ -5,6 +5,9 @@
 -----------
 
 Anubhav.ai is a chatbot with media viewer capabilities, built using HTML, CSS, JavaScript, and Flask. The chatbot allows users to interact with it, create mindmaps, take quizzes, and view media content such as YouTube videos and PDF documents. Usecases are not limited to asking questions about documents, but have additional features including things like Mindmap Generation, Auto-Graded Quiz Creations, etc based on the provided documents/youtube videos.
+For example, here's a mindmap generated about this github repo by the chatbot itself!
+
+{mindmap_here}
 
 ## Features
 ------------
@@ -60,9 +63,10 @@ Anubhav.ai is a chatbot with media viewer capabilities, built using HTML, CSS, J
 * Langchain was used for handling LLM responses and developing endpoint backends.
 * LLM APIs were used from Together.ai, the API keys for `Zense Submission` will be included in the `is there anything else we need to know section of the response`.
 * The user interface is built using HTML, CSS, and JavaScript.
-* Mindmaps are created using self developed APIs, scalable to any LLM.
+* Mindmaps are created using self developed APIs in python (flask), scalable to any LLM.
 * Quizzes are generated based on user input and stored in a database, also an API that can be scaled to any LLM.
 * Media content is displayed using embedded YouTube videos and PDF viewers.
+* Chroma DB was used for vector stores.
 
 ## Limitations
 ---------
