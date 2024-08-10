@@ -404,7 +404,8 @@ function displayMedia(mediaItem) {
     if (mediaItem.type === 'mindmaps' || mediaItem.type === 'mindmap') {
         console.log("Rendering mindmap");
         $mediaContent.html('<div id="mindmap-container" style="height: 100%; width: 100%;"></div>');
-        $.getJSON(`/get_mindmap/${currentChatId}/${mediaItem.name}`, function(data) {
+        let filename = mediaItem.content; // Use the content property directly
+        $.getJSON(`/get_mindmap/${currentChatId}/${encodeURIComponent(filename)}`, function(data) {
             var container = document.getElementById('mindmap-container');
             var options = {
                 layout: {
@@ -424,7 +425,7 @@ function displayMedia(mediaItem) {
             };
             var network = new vis.Network(container, data, options);
         });
-    } else if (mediaItem.type === 'youtube') {
+    }else if (mediaItem.type === 'youtube') {
         console.log("Rendering YouTube video");
         var videoId = getYouTubeVideoId(mediaItem.name);
         $mediaContent.html(`<div class="video-container"><iframe src="https://www.youtube.com/embed/${videoId}" frameborder="0" allowfullscreen></iframe></div>`);
@@ -551,20 +552,41 @@ $("#messageArea").on("submit", function(event) {
 });
 
 function createMindmap(topic) {
+    displayUserMessage(`/Mindmap ${topic}`);
+
+    let loadingHtml = `
+        <div class="d-flex justify-content-start mb-4">
+            <div class="img_cont_msg">
+                <img src="{{url_for('static', filename = 'anubhava.jpg')}}" class="rounded-circle user_img_msg">
+            </div>
+            <div class="msg_cotainer">
+                <div class="loading">Generating mindmap...</div>
+                <span class="msg_time">${new Date().toLocaleTimeString()}</span>
+            </div>
+        </div>
+    `;
+    $("#messageFormeight").append(loadingHtml);
+    scrollToBottom();
+
     $.ajax({
         url: '/create_mindmap',
         type: 'POST',
         contentType: 'application/json',
         data: JSON.stringify({ topic: topic, chat_id: currentChatId }),
         success: function(response) {
-            addMedia('mindmap', response.filename, `Mindmap: ${topic}`);
+            $(".loading").closest(".d-flex").remove();
+            let filename = response.filename.replace('_mindmap.json', '.json');
+            addMedia('mindmap', filename, `Mindmap: ${topic}`);
+            displayBotMessage(`Mindmap for "${topic}" has been generated and added to the media viewer.`);
         },
         error: function(xhr, status, error) {
+            $(".loading").closest(".d-flex").remove();
             console.error("Error creating mindmap:", error);
-            alert("Error creating mindmap: " + xhr.responseJSON.error);
+            displayBotMessage(`Error creating mindmap: ${xhr.responseJSON.error}`);
         }
     });
 }
+
 
 function processYouTubeLink(url) {
     $.ajax({
