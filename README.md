@@ -19,6 +19,9 @@ Here's a link for the quick demo : [Youtube](https://youtu.be/a4pJpp_DbgQ)
 * **Media selector**: Select and view previous media content, like generated mindmaps or uploaded documents and videos.
 * **Chat Folders**: Organize your chat sessions, by storing them in different folders, each with their own vector store for RAG. They are titled by your first message to chatbot.
 
+  [Screenshot 1]()
+  [Screenshot 2]()
+
 ## How to Use
 --------------
 
