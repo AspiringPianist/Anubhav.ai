@@ -13,6 +13,7 @@ from query_data import query_rag
 from mindmap_utils import generate_mindmap
 import json, base64, io, uuid
 from datetime import datetime
+from urllib.parse import unquote
 
 app = Flask(__name__)
 
@@ -230,6 +231,7 @@ def create_mindmap():
     
     # Save the mindmap data as JSON
     filename = f"{topic.replace(' ', '_')}_mindmap.json"
+    filename = filename.replace('_mindmap.json', '.json')
     filepath = os.path.join(chat_dir, 'media', 'mindmaps', filename)
     os.makedirs(os.path.dirname(filepath), exist_ok=True)
     with open(filepath, 'w') as f:
@@ -281,11 +283,7 @@ def get_chat_history(chat_id):
 @app.route('/get_mindmap/<chat_id>/<filename>')
 def get_mindmap(chat_id, filename):
     chat_dir = create_chat_directory(chat_id)
-    filename = filename.replace(' ', '_')
-    if filename.endswith('_mindmap.json'):
-        filename = filename.replace('_mindmap.json', '.json')
-    elif filename.endswith('._mindmap.json'):
-        filename = filename.replace('._mindmap.json', '.json')
+    filename = unquote(filename)  # Decode the URL-encoded filename
     filepath = os.path.join(chat_dir, 'media', 'mindmaps', filename)
     if os.path.exists(filepath):
         with open(filepath, 'r') as f:
